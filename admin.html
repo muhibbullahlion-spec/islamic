@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:#0a0f0a; color:#e8f0ea; padding:16px;
+    max-width:520px; margin:0 auto; padding-bottom:40px;
+    font-family:'Poppins','Hind Siliguri',sans-serif;
+  }
+  h1 { font-size:20px; margin-bottom:4px; color:#22c55e; font-weight:800; }
+  .sub { font-size:12px; color:#8a9b8f; margin-bottom:16px; }
+  .card { background:#141a16; padding:18px; border-radius:16px; margin-bottom:14px; border:1px solid #1f2a22; }
+  .card h3 { font-size:15px; margin-bottom:12px; color:#22c55e; font-weight:700; }
+  input, textarea, select {
+    width:100%; padding:12px; border-radius:10px; border:1px solid #2a3a30;
+    margin-bottom:10px; background:#0a0f0a; color:#fff; font-size:14px;
+    outline:none; font-family:inherit;
+  }
+  input:focus, textarea:focus, select:focus { border-color:#22c55e; }
+  button {
+    width:100%; padding:12px; border:none; border-radius:10px;
+    background:#16a34a; color:#fff; font-weight:700; font-size:14px; cursor:pointer;
+    font-family:inherit;
+  }
+  button:active { background:#15803d; }
+  .red { background:#dc2626; }
+  .yellow { background:#f59e0b; color:#000; }
+  .blue { background:#3b82f6; }
+  .list-item {
+    background:#0a0f0a; padding:14px; border-radius:12px; margin-bottom:10px;
+    border:1px solid #1f2a22;
+  }
+  .list-item .top { display:flex; justify-content:space-between; align-items:start; gap:8px; margin-bottom:8px; }
+  .list-item b { font-size:13px; color:#22c55e; }
+  .list-item p { font-size:12px; color:#c7d5cb; margin:3px 0; line-height:1.5; }
+  .list-item .actions { display:flex; gap:6px; margin-top:10px; }
+  .list-item .actions button { padding:8px 12px; width:auto; font-size:12px; }
+  .tabs {
+    display:flex; gap:6px; margin-bottom:14px; overflow-x:auto; padding-bottom:4px;
+  }
+  .tab {
+    padding:9px 14px; border-radius:20px; background:#141a16;
+    border:1px solid #2a3a30; font-size:12px; color:#8a9b8f;
+    white-space:nowrap; cursor:pointer; font-weight:600;
+  }
+  .tab.active { background:#16a34a; color:#fff; border-color:#16a34a; }
+  .badge {
+    display:inline-block; padding:3px 10px; border-radius:12px; font-size:11px;
+    font-weight:700;
+  }
+  .b-pending { background:#fef3c7; color:#92400e; }
+  .b-approved { background:#d1fae5; color:#065f46; }
+  .b-rejected { background:#fee2e2; color:#991b1b; }
+  .section { display:none; }
+  .section.active { display:block; }
+</style>
+</head>
+<body>
+
+<h1>⚙️ Admin Panel</h1>
+<div class="sub">Bangladesh Chhatra Hizbullah</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('posts', this)">📝 Posts</div>
+  <div class="tab" onclick="showTab('members', this)">👥 Members</div>
+  <div class="tab" onclick="showTab('tx', this)">💰 Transactions</div>
+  <div class="tab" onclick="showTab('events', this)">📅 Events</div>
+  <div class="tab" onclick="showTab('payments', this)">💵 Payments</div>
+  <div class="tab" onclick="showTab('chat', this)">💬 Chat</div>
+</div>
+
+<!-- POSTS -->
+<div id="sec-posts" class="section active">
+  <div class="card">
+    <h3>📝 New Post</h3>
+    <input id="pAuthor" placeholder="Author name" value="Admin">
+    <textarea id="pText" rows="3" placeholder="Write post..."></textarea>
+    <button onclick="addPost()">Post</button>
+  </div>
+  <div class="card">
+    <h3>📋 All Posts</h3>
+    <div id="postList">Loading...</div>
+  </div>
+</div>
+
+<!-- MEMBERS -->
+<div id="sec-members" class="section">
+  <div class="card">
+    <h3>👥 Add Member</h3>
+    <input id="mName" placeholder="Name *">
+    <input id="mPhone" placeholder="Phone number">
+    <input id="mFb" placeholder="Facebook (username or full URL)">
+    <input id="mWa" placeholder="WhatsApp (8801...)">
+    <input id="mIg" placeholder="Instagram (username or URL)">
+    <input id="mTg" placeholder="Telegram (username or URL)">
+    <button onclick="addMember()">Add Member</button>
+  </div>
+  <div class="card">
+    <h3>📋 All Members</h3>
+    <div id="memberList">Loading...</div>
+  </div>
+</div>
+
+<!-- TRANSACTIONS -->
+<div id="sec-tx" class="section">
+  <div class="card">
+    <h3>💰 New Transaction</h3>
+    <select id="tKind">
+      <option value="income">🟢 Income</option>
+      <option value="expense">🔴 Expense</option>
+    </select>
+    <input id="tPurpose" placeholder="Purpose (e.g., Tea, Travel, Donation)">
+    <input id="tAmount" type="number" placeholder="Amount (৳)">
+    <input id="tDate" type="date">
+    <input id="tNote" placeholder="Note (optional)">
+    <button onclick="addTx()">Add Transaction</button>
+  </div>
+  <div class="card">
+    <h3>📋 All Transactions</h3>
+    <div id="txList">Loading...</div>
+  </div>
+</div>
+
+<!-- EVENTS -->
+<div id="sec-events" class="section">
+  <div class="card">
+    <h3>📅 New Event</h3>
+    <input id="eTitle" placeholder="Event name">
+    <input id="eDate" type="date">
+    <textarea id="eDesc" rows="2" placeholder="Description"></textarea>
+    <button onclick="addEvent()">Add Event</button>
+  </div>
+  <div class="card">
+    <h3>📋 All Events</h3>
+    <div id="eventList">Loading...</div>
+  </div>
+</div>
+
+<!-- PAYMENTS -->
+<div id="sec-payments" class="section">
+  <div class="card">
+    <h3>💵 Member Payment Requests</h3>
+    <div id="paymentList">Loading...</div>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div id="sec-chat" class="section">
+  <div class="card">
+    <h3>💬 Group Chat Messages</h3>
+    <div id="chatList">Loading...</div>
+  </div>
+</div>
+
+<script type="module">
+  import { db } from './firebase.js';
+  import {
+    collection, addDoc, getDocs, deleteDoc, doc, updateDoc,
+    query, orderBy, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  window.showTab = function(name, el) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('sec-' + name).classList.add('active');
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    if (name === 'posts') loadPosts();
+    if (name === 'members') loadMembers();
+    if (name === 'tx') loadTx();
+    if (name === 'events') loadEvents();
+    if (name === 'payments') loadPayments();
+    if (name === 'chat') loadChat();
+  };
+
+  // POSTS
+  window.addPost = async () => {
+    const author = document.getElementById('pAuthor').value.trim() || 'Admin';
+    const text = document.getElementById('pText').value.trim();
+    if (!text) return alert('Write something!');
+    await addDoc(collection(db, 'posts'), { author, text, uid: 'admin', likes: [], createdAt: serverTimestamp() });
+    document.getElementById('pText').value = '';
+    loadPosts();
+    alert('✅ Posted!');
+  };
+
+  async function loadPosts() {
+    const box = document.getElementById('postList');
+    try {
+      const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
+      const snap = await getDocs(q);
+      if (snap.empty) { box.innerHTML = '<p style="color:#8a9b8f;font-size:13px;">No posts</p>'; return; }
+      box.innerHTML = snap.docs.map(d => {
+        const p = d.data();
+        return `<div class="list-item">
+          <div class="top">
+            <b>👤 ${esc(p.author)}</b>
+            <button class="red" style="width:auto;padding:6px 10px;font-size:12px;" onclick="delPost('${d.id}')">🗑️</button>
+          </div>
+          <p>${esc(p.text)}</p>
+        </div>`;
+      }).join('');
+    } catch(e) { box.innerHTML = 'Load failed'; }
+  }
+
+  window.delPost = async (id) => {
+    if (!confirm('Delete?')) return;
+    await deleteDoc(doc(db, 'posts', id));
+    loadPosts();
+  };
+
+  // MEMBERS
+  window.addMember = async () => {
+    const name = document.getElementById('mName').value.trim();
+    if (!name) return alert('Enter name!');
+    await addDoc(collection(db, 'members'), {
+      name,
+      phone: document.getElementById('mPhone').value.trim(),
+      facebook: document.getElementById('mFb').value.trim(),
+      whatsapp: document.getElementById('mWa').value.trim(),
+      instagram: document.getElementById('mIg').value.trim(),
+      telegram: document.getElementById('mTg').value.trim(),
+      createdAt: serverTimestamp()
+    });
+    ['mName','mPhone','mFb','mWa','mIg','mTg'].forEach(id => document.getElementById(id).value = '');
+    loadMembers();
+    alert('✅ Member added!');
+  };
+
+  async function loadMembers() {
+    const box = document.getElementById('memberList');
+    try {
+      const snap = await getDocs(collection(db, 'members'));
+      if (snap.empty) { box.innerHTML = '<p style="color:#8a9b8f;font-size:13px;">No members</p>'; return; }
+      box.innerHTML = snap.docs.map(d => {
+        const m = d.data();
+        return `<div class="list-item">
+          <div class="top">
+            <b>👤 ${esc(m.name)}</b>
+            <button class="red" style="width:auto;padding:6px 10px;font-size:12px;" onclick="delMember('${d.id}')">🗑️</button>
+          </div>
+          <p>📞 ${esc(m.phone || '-')}</p>
+          ${m.facebook ? `<p>📘 ${esc(m.facebook)}</p>` : ''}
+          ${m.whatsapp ? `<p>💬 ${esc(m.whatsapp)}</p>` : ''}
+          ${m.instagram ? `<p>📷 ${esc(m.instagram)}</p>` : ''}
+          ${m.telegram ? `<p>✈️ ${esc(m.telegram)}</p>` : ''}
+        </div>`;
+      }).join('');
+    } catch(e) { box.innerHTML = 'Load failed'; }
+  }
+
+  window.delMember = async (id) => {
+    if (!confirm('Delete?')) return;
+    await deleteDoc(doc(db, 'members', id));
+    loadMembers();
+  };
+
+  // TRANSACTIONS
+  window.addTx = async () => {
+    const kind = document.getElementById('tKind').value;
+    const purpose = document.getElementById('tPurpose').value.trim();
+    const amount = Number(document.getElementById('tAmount').value);
+    const date = document.getElementById('tDate').value;
+    const note = document.getElementById('tNote').value.trim();
+
+    if (!purpose) return alert('Enter purpose!');
+    if (!amount || amount <= 0) return alert('Enter amount!');
+
+    await addDoc(collection(db, 'transactions'), {
+      kind, purpose, amount, date, note, createdAt: serverTimestamp()
+    });
+    ['tPurpose','tAmount','tDate','tNote'].forEach(id => document.getElementById(id).value = '');
+    loadTx();
+    alert('✅ Transaction added!');
+  };
+
+  async function loadTx() {
+    const box = document.getElementById('txList');
+    try {
+      const q = query(collection(db, 'transactions'), orderBy('createdAt', 'desc'));
+      const snap = await getDocs(q);
+      if (snap.empty) { box.innerHTML = '<p style="color:#8a9b8f;font-size:13px;">No transactions</p>'; return; }
+      box.innerHTML = snap.docs.map(d => {
+        const t = d.data();
+        const isInc = t.kind === 'income';
+        return `<div class="list-item">
+          <div class="top">
+            <b>${isInc ? '🟢 Income' : '🔴 Expense'} — ৳${t.amount}</b>
+            <button class="red" style="width:auto;padding:6px 10px;font-size:12px;" onclick="delTx('${d.id}')">🗑️</button>
+          </div>
+          <p>🎯 ${esc(t.purpose)}</p>
+          ${t.date ? `<p>🗓️ ${esc(t.date)}</p>` : ''}
+          ${t.note ? `<p>📝 ${esc(t.note)}</p>` : ''}
+        </div>`;
+      }).join('');
+    } catch(e) { box.innerHTML = 'Load failed'; }
+  }
+
+  window.delTx = async (id) => {
+    if (!confirm('Delete?')) return;
+    await deleteDoc(doc(db, 'transactions', id));
+    loadTx();
+  };
+
+  // EVENTS
+  window.addEvent = async () => {
+    const title = document.getElementById('eTitle').value.trim();
+    if (!title) return alert('Enter event name!');
+    await addDoc(collection(db, 'events'), {
+      title,
+      date: document.getElementById('eDate').value,
+      desc: document.getElementById('eDesc').value.trim()
+    });
+    ['eTitle','eDate','eDesc'].forEach(id => document.getElementById(id).value = '');
+    loadEvents();
+    alert('✅ Event added!');
+  };
+
+  async function loadEvents() {
+    const box = document.getElementById('eventList');
+    try {
+      const snap = await getDocs(collection(db, 'events'));
+      if (snap.empty) { box.innerHTML = '<p style="color:#8a9b8f;font-size:13px;">No events</p>'; return; }
+      box.innerHTML = snap.docs.map(d => {
+        const e = d.data();
+        return `<div class="list-item">
+          <div class="top">
+            <b>📅 ${esc(e.title)}</b>
+            <button class="red" style="width:auto;padding:6px 10px;font-size:12px;" onclick="delEvent('${d.id}')">🗑️</button>
+          </div>
+          <p>🗓️ ${esc(e.date || '')}</p>
+          <p>${esc(e.desc || '')}</p>
+        </div>`;
+      }).join('');
+    } catch(e) { box.innerHTML = 'Load failed'; }
+  }
+
+  window.delEvent = async (id) => {
+    if (!confirm('Delete?')) return;
+    await deleteDoc(doc(db, 'events', id));
+    loadEvents();
+  };
+
+  // PAYMENTS
+  async function loadPayments() {
+    const box = document.getElementById('paymentList');
+    try {
+      const q = query(collection(db, 'payments'), orderBy('createdAt', 'desc'));
+      const snap = await getDocs(q);
+      if (snap.empty) { box.innerHTML = '<p style="color:#8a9b8f;font-size:13px;">No payments</p>'; return; }
+      box.innerHTML = snap.docs.map(d => {
+        const p = d.data();
+        const cls = 'b-' + (p.status || 'pending');
+        const statusText = p.status === 'approved' ? '✅ Approved' : p.status === 'rejected' ? '❌ Rejected' : '⏳ Pending';
+        return `<div class="list-item">
+          <div class="top">
+            <b>👤 ${esc(p.nickname)}</b>
+            <span class="badge ${cls}">${statusText}</span>
+          </div>
+          <p>💵 ৳${p.amount} • ${esc(p.method)}</p>
+          <p>🧾 TrxID: ${esc(p.txId)}</p>
+          ${p.note ? `<p>📝 ${esc(p.note)}</p>` : ''}
+          <div class="actions">
+            <button class="blue" onclick="approvePayment('${d.id}')">✅ Approve</button>
+            <button class="yellow" onclick="rejectPayment('${d.id}')">❌ Reject</button>
+            <button class="red" onclick="delPayment('${d.id}')">🗑️</button>
+          </div>
+        </div>`;
+      }).join('');
+    } catch(e) { box.innerHTML = 'Load failed'; }
+  }
+
+  window.approvePayment = async (id) => {
+    const snap = await getDocs(collection(db, 'payments'));
+    let pData = null;
+    snap.forEach(d => { if (d.id === id) pData = d.data(); });
+    if (!pData) return;
+
+    await updateDoc(doc(db, 'payments', id), { status: 'approved' });
+    await addDoc(collection(db, 'transactions'), {
+      kind: 'income',
+      purpose: `${pData.nickname}'s payment (${pData.method})`,
+      amount: Number(pData.amount),
+      note: `TrxID: ${pData.txId}`,
+      date: new Date().toISOString().slice(0,10),
+      createdAt: serverTimestamp()
+    });
+    loadPayments();
+    alert('✅ Approved & added to transactions!');
+  };
+
+  window.rejectPayment = async (id) => {
+    if (!confirm('Reject?')) return;
+    await updateDoc(doc(db, 'payments', id), { status: 'rejected' });
+    loadPayments();
+  };
+
+  window.delPayment = async (id) => {
+    if (!confirm('Delete?')) return;
+    await deleteDoc(doc(db, 'payments', id));
+    loadPayments();
+  };
+
+  // CHAT
+  async function loadChat() {
+    const box = document.getElementById('chatList');
+    try {
+      const q = query(collection(db, 'chat'), orderBy('createdAt', 'desc'));
+      const snap = await getDocs(q);
+      if (snap.empty) { box.innerHTML = '<p style="color:#8a9b8f;font-size:13px;">No messages</p>'; return; }
+      box.innerHTML = snap.docs.map(d => {
+        const m = d.data();
+        const time = m.createdAt?.toDate?.().toLocaleString() || '';
+        return `<div class="list-item">
+          <div class="top">
+            <b>👤 ${esc(m.name)}</b>
+            <button class="red" style="width:auto;padding:6px 10px;font-size:12px;" onclick="delChat('${d.id}')">🗑️</button>
+          </div>
+          <p>${esc(m.text)}</p>
+          <p style="color:#6b7a70;font-size:11px;">🕐 ${time}</p>
+        </div>`;
+      }).join('');
+    } catch(e) { box.innerHTML = 'Load failed'; }
+  }
+
+  window.delChat = async (id) => {
+    if (!confirm('Delete message?')) return;
+    await deleteDoc(doc(db, 'chat', id));
+    loadChat();
+  };
+
+  function esc(s) {
+    return String(s||'').replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+  }
+
+  loadPosts();
+</script>
+</body>
+  </html>
